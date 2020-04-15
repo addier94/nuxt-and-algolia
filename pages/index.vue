@@ -33,11 +33,25 @@
                 Found {{ nbHits }} results
               </h1>
             </ais-stats>
-            <ais-hits>
+
+            <ais-pagination 
+              :class-names="aisPaginationClassNames"
+            />
+
+            <ais-hits
+              :class-names="{
+                'ais-Hits': 'mb-10'
+              }"
+            >
               <div slot="item" slot-scope="{ item }">
                 <SomeComponent :item="item" />
               </div>
             </ais-hits>
+
+            <ais-pagination 
+              :class-names="aisPaginationClassNames"
+            />
+
           </div>
         </div>
       </ais-state-results>
@@ -53,7 +67,8 @@
     AisSearchBox,
     AisStateResults,
     AisStats,
-    AisPoweredBy
+    AisPoweredBy,
+    AisPagination
   } from 'vue-instantsearch'
   
   import SomeComponent from '@/components/SomeComponent'
@@ -66,13 +81,22 @@ export default {
     AisStateResults,
     AisStats,
     AisPoweredBy,
+    AisPagination,
 
     SomeComponent
   },
 
   data () {
     return {
-      instantSearchState: null
+      instantSearchState: null,
+
+      aisPaginationClassNames: {
+        'ais-Pagination': 'mb-10',
+        'ais-Pagination-list': 'flex flex-wrap',
+        'ais-Pagination-link': 'inline-block w-10 h-10 flex items-center justify-center',
+        'ais-Pagination-item': 'bg-white rounded mr-3 mb-2',
+        'ais-Pagination-item--selected': 'bg-blue-500 text-white'
+      }
     }
   },
 
@@ -86,11 +110,12 @@ export default {
     this.$instantsearch.hydrate(this.instantSearchState)
   },
 
-  asyncData ({ app }) {
+  asyncData ({ app, query }) {
     const instantsearch = app.$instantsearch
 
     return instantsearch
       .findResultsState({
+        query: query.query,
         hitsPerPage: 10
       })
       .then(() => {
